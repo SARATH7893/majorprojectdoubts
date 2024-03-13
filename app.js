@@ -5,7 +5,7 @@ const Listing=require("./models/listing.js");
 const path=require("path");
 const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 const methodOverride=require("method-override");
-
+const ejsMate=require("ejs-mate");
 main().then(()=>{
     console.log("connected to db");
 }).catch(err=>{
@@ -52,11 +52,18 @@ app.get("/listings/:id/edit",async (req,res)=>{
     res.render("./listings/edit.ejs",{listing});
 });
 
-app.put("/listings/:id",async (req,res)=>{
-    let {id}=req.params;
-    await Listing.findByIdAndUpdate(id,{...req.body.listing});
-    res.redirect("./listings");
-});
+app.put("/listings/:id", async (req, res) => {
+    let { id } = req.params;
+    await Listing.findByIdAndUpdate(id, req.body.listing);
+    res.redirect(`/listings/${id}`); // Redirect to the updated listing's details page
+  });
+
+  app.delete("/listings/:id",async (req,res)=>{
+    let { id } = req.params;
+    let deletedListing=await Listing.findByIdAndDelete(id);
+    console.log(deletedListing);
+    res.redirect("/listings");
+  });
 
 // app.get("/testListing",async (req,res)=>{
 // let sampleListing=new Listing({
