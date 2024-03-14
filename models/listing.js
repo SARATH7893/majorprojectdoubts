@@ -10,7 +10,6 @@ const listingSchema = new Schema({
   image: {
     filename: {
       type: String,
-
       default: "listingimage",
     },
     url: {
