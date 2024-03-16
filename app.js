@@ -52,6 +52,31 @@ app.post("/listings",wrapAsync(async (req,res,next)=>{
     throw new ExpressError(400,"SEND VALID DATA FOR LISTING");
   }
     const newListing=new Listing(req.body.listing);
+
+    if(!newListing.title)
+    {
+      throw new ExpressError(400,"TITLE IS MISSING");
+    }
+    if(!newListing.description)
+    {
+      throw new ExpressError(400,"DECRIPTION IS MISSING");
+    }
+    if(!newListing.image)
+    {
+      throw new ExpressError(400,"IMAGE IS MISSING");
+    }
+    if(!newListing.price)
+    {
+      throw new ExpressError(400,"PRICE IS MISSING");
+    }
+    if(!newListing.country)
+    {
+      throw new ExpressError(400,"COUNTRY IS MISSING");
+    }
+    if(!newListing.location)
+    {
+      throw new ExpressError(400,"LOCATION IS MISSING");
+    }
     await newListing.save();
     res.redirect("./listings");
 }));
@@ -97,8 +122,8 @@ app.all("*",(req,res,next)=>{
 
 app.use((err,req,res,next)=>{
   let {statusCode=500,message="something went wrong"}=err;
-  //res.render("error.ejs");
-  res.status(statusCode).send(message);
+  //res.status(statusCode).send(message);
+  res.render("error.ejs",{err});
 });
 
 app.listen(8080,()=>{
