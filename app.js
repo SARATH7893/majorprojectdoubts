@@ -48,6 +48,9 @@ app.get("/listings/new",(req,res)=>{
 );
 
 app.post("/listings",wrapAsync(async (req,res,next)=>{
+  if(!req.body.listing){
+    throw new ExpressError(400,"SEND VALID DATA FOR LISTING");
+  }
     const newListing=new Listing(req.body.listing);
     await newListing.save();
     res.redirect("./listings");
@@ -60,6 +63,9 @@ app.get("/listings/:id/edit",wrapAsync(async (req,res)=>{
 }));
 
 app.put("/listings/:id", wrapAsync(async (req, res) => {
+  if(!req.body.listing){
+    throw new ExpressError(400,"SEND VALID DATA FOR LISTING");
+  }
   let { id } = req.params;
   await Listing.findByIdAndUpdate(id, req.body.listing);
   res.redirect(`/listings/${id}`); 
@@ -91,6 +97,7 @@ app.all("*",(req,res,next)=>{
 
 app.use((err,req,res,next)=>{
   let {statusCode=500,message="something went wrong"}=err;
+  //res.render("error.ejs");
   res.status(statusCode).send(message);
 });
 
