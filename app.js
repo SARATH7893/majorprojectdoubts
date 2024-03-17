@@ -8,7 +8,7 @@ const methodOverride=require("method-override");
 const ejsMate=require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/ExpressError.js");
-const {listingSchema}=require("./schema.js");
+const {listingSchema,reviewSchema}=require("./schema.js");
 const Review=require("./models/review.js");
 
 main().then(()=>{
@@ -42,6 +42,16 @@ const validateListing=(req,res,next)=>{
   }
 };
 
+const validateReview=(req,res,next)=>{
+  let {error}=reviewSchema.validate(req.body);
+  if(error){
+    let errMsg=error.details.map((el)=>el.message).join(",");
+    throw new ExpressError(400,errMsg);
+  }else{
+    next();
+  }
+};
+
 app.get("/listings",wrapAsync(async (req,res)=>{
  const allListings=await Listing.find({});
  res.render("./listings/index.ejs",{allListings});
@@ -67,7 +77,7 @@ app.post("/listings",validateListing,wrapAsync(async (req,res,next)=>{
 
 app.get("/listings/:id/edit",wrapAsync(async (req,res)=>{
     let {id}=req.params;
-    const listing=await Listing.findById(id);
+    const listing=await Listing.findById(id).populate("reviews");
     res.render("./listings/edit.ejs",{listing});
 }));
 
@@ -77,22 +87,21 @@ app.put("/listings/:id",validateListing, wrapAsync(async (req, res) => {
   res.redirect(`/listings/${id}`); 
 }));
 
-  app.delete("/listings/:id",wrapAsync(async (req,res)=>{
+app.delete("/listings/:id",wrapAsync(async (req,res)=>{
     let { id } = req.params;
     let deletedListing=await Listing.findByIdAndDelete(id);
     console.log(deletedListing);
     res.redirect("/listings");
-  }));
+}));
 
-app.post("/listings/:id/reviews",async(req,res)=>{
+app.post("/listings/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
 let listing=await Listing.findById(req.params.id);
 let newReview=new Review(req.body.review);
 listing.reviews.push(newReview);
 await newReview.save();
 await listing.save();
-console.log("new review saved");
-res.send("new review saved");
-});
+res.redirect(`/listings/${listing._id}`); 
+}));
 
 // app.get("/testListing",async (req,res)=>{
 // let sampleListing=new Listing({
