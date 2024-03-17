@@ -9,7 +9,7 @@ const ejsMate=require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/ExpressError.js");
 const {listingSchema}=require("./schema.js");
-
+const Review=require("./models/review.js");
 
 main().then(()=>{
     console.log("connected to db");
@@ -83,6 +83,16 @@ app.put("/listings/:id",validateListing, wrapAsync(async (req, res) => {
     console.log(deletedListing);
     res.redirect("/listings");
   }));
+
+app.post("/listings/:id/reviews",async(req,res)=>{
+let listing=await Listing.findById(req.params.id);
+let newReview=new Review(req.body.review);
+listing.reviews.push(newReview);
+await newReview.save();
+await listing.save();
+console.log("new review saved");
+res.send("new review saved");
+});
 
 // app.get("/testListing",async (req,res)=>{
 // let sampleListing=new Listing({
