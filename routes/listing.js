@@ -23,16 +23,20 @@ router.get("/",wrapAsync(async (req,res)=>{
 router.get("/new",(req,res)=>{
        res.render("./listings/new.ejs");
 });
-   
+  
+//SHOW ROUTE
 router.get("/:id", wrapAsync(async (req, res) => {
            let { id } = req.params;
              const listing = await Listing.findById(id).populate("reviews");
-             console.log("Listing found:", listing); 
+             if(!listing){
+              req.flash("error","LISTING YOU REQUESTED FOR DOES NOT EXIST!" );
+              res.redirect("/listings");
+             }
              res.render("./listings/show.ejs", { listing });
      })
 );
 
-//ADD NEW LISTING
+//CREATE ROUTE
 router.post("/",validateListing,wrapAsync(async (req,res,next)=>{
     const newListing=new Listing(req.body.listing);
     await newListing.save();
@@ -40,6 +44,7 @@ router.post("/",validateListing,wrapAsync(async (req,res,next)=>{
     res.redirect("./listings");
 }));
 
+//EDIT ROUTE
 router.get("/:id/edit",wrapAsync(async (req,res)=>{
     let {id}=req.params;
     const listing=await Listing.findById(id);
