@@ -6,19 +6,15 @@
         <h3> <%=listing.title%></h3>
         <img src="<%=listing.image%>" class="card-img-top show-img" alt="listing_image">
         <div class="card-body">
-          <p class="card-text">
-            <%=listing.description%>
-            <br>
-            &#8377;<%=listing.price.toLocaleString("en-In")%>
-            <br>
-            <%=listing.location%>
-            <br>
-            <%=listing.country%>
-        </p>
+          <p class="card-text">OWNED BY:<%=listing.owner.username%></p>
+          <p class="card-text"><%=listing.description%></p>  
+          <p class="card-text">&#8377;<%=listing.price.toLocaleString("en-In")%></p>
+          <p class="card-text"><%=listing.location%></p>  
+          <p class="card-text"><%=listing.country%></p>   
         </div>
     </div>
-    <br>
 </div>
+<br>
 <div class="btns">
     <a href="/listings/<%=listing._id%>/edit" class=" btn btn-dark col-1 offset-3 add-btn">EDIT</a>
     <form method="POST" action="/listings/<%=listing._id%>?_method=DELETE" >
