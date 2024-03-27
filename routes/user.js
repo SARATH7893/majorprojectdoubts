@@ -5,47 +5,16 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const passport=require("passport");
 const {saveRedirectUrl}=require("../middelware.js");
 
-router.get("/signup",(req,res)=>{
-res.render("users/signup.ejs");
-});
+const userConTroller=require("../controllers/users.js");
 
-router.post("/signup",wrapAsync(async(req,res)=>{
-    try{
-        let {username,email,password}=req.body;
-        const newUser=new User({email,username});
-        const registeredUser= await User.register(newUser,password);
-        console.log(registeredUser);
-        req.login(registeredUser,(err)=>{
-            if(err){
-                return next(err);
-            }
-            req.flash("success","WELCOME TO WANDERLUST!");
-            res.redirect("/listings");
-        })
-    }catch(e){
-        req.flash("error",e.message);
-        res.redirect("/signup");
-    }
-}));
+router.get("/signup",userConTroller.renderSignupForm);
 
-router.get("/login",(req,res)=>{
-    res.render("users/login.ejs");
-});
+router.post("/signup",wrapAsync(userConTroller.signUp));
 
-router.post("/login",saveRedirectUrl,passport.authenticate("local",{failureRedirect:'/login',failureFlash:true}),async(req,res)=>{
-req.flash("success","WELCOME BACK TO WANDERLUST!");
-let redirectUrl=res.locals.redirectUrl || "/listings";
-res.redirect(redirectUrl);
-});
+router.get("/login",userConTroller.renderLoginForm);
 
-router.get("/logout",(req,res,next)=>{
-req.logOut((err)=>{
-if(err){
-    return next(err);
-}
-req.flash("success","YOU ARE LOGGED OUT!");
-res.redirect("/listings");
-})
-});
+router.post("/login",saveRedirectUrl,passport.authenticate("local",{failureRedirect:'/login',failureFlash:true}),userConTroller.login);
+
+router.get("/logout",userConTroller.logout);
 
 module.exports=router;

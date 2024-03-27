@@ -82,14 +82,18 @@ app.all("*",(req,res,next)=>{
   next(new ExpressError(404,"PAGE NOT FOUND"));
 });
 
-app.use((err, req, res, next) => {
-  if (err.status === 404) {
-    res.status(404);
-    res.set("Content-Type", "text/plain");
-    res.send("Page not found.");
-  }
-});
+// app.use((err, req, res, next) => {
+//   if (err.status === 404) {
+//     res.status(404);
+//     res.set("Content-Type", "text/plain");
+//     res.send("Page not found.");
+//   }
+// });
 
+app.use((err, req, res, next) => {
+  let { statusCode = 500, message = "Something Went Wrong" } = err;
+  res.status(statusCode).render("error.ejs", { err, req, statusCode });
+})
 app.listen(8080,()=>{
     console.log("server is listening");
 })
