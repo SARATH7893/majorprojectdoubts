@@ -7,13 +7,13 @@ const {saveRedirectUrl}=require("../middelware.js");
 
 const userConTroller=require("../controllers/users.js");
 
-router.get("/signup",userConTroller.renderSignupForm);
+router.route("/signup")
+.get(userConTroller.renderSignupForm)
+.post(wrapAsync(userConTroller.signUp));
 
-router.post("/signup",wrapAsync(userConTroller.signUp));
-
-router.get("/login",userConTroller.renderLoginForm);
-
-router.post("/login",saveRedirectUrl,passport.authenticate("local",{failureRedirect:'/login',failureFlash:true}),userConTroller.login);
+router.route("/login")
+.get(userConTroller.renderLoginForm)
+.post(saveRedirectUrl,passport.authenticate("local",{failureRedirect:'/login',failureFlash:true}),userConTroller.login);
 
 router.get("/logout",userConTroller.logout);
 

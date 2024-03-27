@@ -6,25 +6,19 @@ const {isLoggedin,isOwner,validateListing}=require("../middelware.js");
 
 const listingController=require("../controllers/listing.js");
 
-//INDEX ROUTE
-router.get("/",wrapAsync(listingController.index));
-  
+router.route("/")
+.get(wrapAsync(listingController.index))//INDEX ROUTE
+.post(validateListing,isLoggedin,wrapAsync(listingController.createListing));//CREATE ROUTE
+
 //NEW ROUTE
 router.get("/new",isLoggedin,listingController.renderNewForm);
-  
-//SHOW ROUTE
-router.get("/:id", wrapAsync(listingController.showListing));
 
-//CREATE ROUTE
-router.post("/",validateListing,isLoggedin,wrapAsync(listingController.createListing));
+router.route("/:id")
+.get( wrapAsync(listingController.showListing))//SHOW ROUTE
+.put(isLoggedin,isOwner,validateListing, wrapAsync(listingController.updateListing))//UPDATE ROUTE
+.delete(isLoggedin,isOwner,wrapAsync(listingController.destroyListing));//DELETE ROUTE
 
 //EDIT ROUTE
 router.get("/:id/edit",isLoggedin,isOwner,wrapAsync(listingController.renderEditForm));
-
-//UPDATE ROUTE
-router.put("/:id",isLoggedin,isOwner,validateListing, wrapAsync(listingController.updateListing));
-
-//DELETE ROUTE
-router.delete("/:id",isLoggedin,isOwner,wrapAsync(listingController.destroyListing));
 
 module.exports=router;
